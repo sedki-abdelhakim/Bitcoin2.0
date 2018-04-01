@@ -3,38 +3,40 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class Block {
-	private Map<String, String> prevHash;
-	private Map<String, String> Hash;
+	private String prevHash;
+	private String Hash;
 	private int nonce;
 	private int numOfTransactions;
 	private LinkedList<Transaction> transactionsList;
+	private String merkleTreeRootHash;
 	
 	
-	public Block(Map<String, String> prevHash, Map<String, String> Hash, int nonce, int numOfTransactions, LinkedList<Transaction> transactionsList){
+	public Block( String prevHash, String Hash, int nonce,  LinkedList<Transaction> transactionsList,String merkleTreeRootHash){
 		 this.prevHash = prevHash;
 		 this.Hash = Hash;
-		 this.nonce = nonce;
-		 this.numOfTransactions = numOfTransactions;
+		 this.nonce = nonce; 
 		 this.transactionsList = transactionsList;
+		 this.numOfTransactions = transactionsList.size();
+		 this.merkleTreeRootHash =merkleTreeRootHash;
 	}
 
 
-	public Map<String, String> getPrevHash() {
+	public String getPrevHash() {
 		return prevHash;
 	}
 
 
-	public void setPrevHash(Map<String, String> prevHash) {
+	public void setPrevHash(String prevHash) {
 		this.prevHash = prevHash;
 	}
 
 
-	public Map<String, String> getHash() {
+	public String getHash() {
 		return Hash;
 	}
 
 
-	public void setHash(Map<String, String> hash) {
+	public void setHash( String hash) {
 		Hash = hash;
 	}
 
@@ -50,7 +52,7 @@ public class Block {
 
 
 	public int getNumOfTransactions() {
-		return numOfTransactions;
+		return numOfTransactions ;
 	}
 
 
@@ -66,6 +68,16 @@ public class Block {
 
 	public void setTransactionsList(LinkedList<Transaction> transactionsList) {
 		this.transactionsList = transactionsList;
+	}
+
+
+	public String getMerkleTreeRootHash() {
+		return merkleTreeRootHash;
+	}
+
+
+	public void setMerkleTreeRootHash(String merkleTreeRootHash) {
+		this.merkleTreeRootHash = merkleTreeRootHash;
 	}
 
 }
