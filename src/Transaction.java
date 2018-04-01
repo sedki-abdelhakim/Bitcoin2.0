@@ -50,7 +50,7 @@ public class Transaction {
 	byte[] Generate_Hash() throws NoSuchAlgorithmException{
 		MessageDigest msg_digest = MessageDigest.getInstance("SHA-256");
 		String originalString = ""+generate_UniqueID()+previous_Transactions+hash_Next_Owner
-								+PublicKey_Sender+PublicKey_Receiver;
+					  +PublicKey_Sender+PublicKey_Receiver;
 		byte[] encodedhash = msg_digest.digest(originalString.getBytes(StandardCharsets.UTF_8));
 		return encodedhash ;
 		
@@ -71,17 +71,17 @@ public class Transaction {
 		KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
 		kpg.initialize(2048);
 		KeyPair kp = kpg.generateKeyPair();
-	    pub = kp.getPublic();
+	        pub = kp.getPublic();
 		pvt = kp.getPrivate();
 		
 		// public then private
 		byte [] encrypt_msg = encrypt(pub, hashed_msg.toString());     
-        System.out.println(new String(encrypt_msg));
-		
-        byte [] doubled_encrypt_msg = encrypt(pvt, encrypt_msg.toString()); 
-        hash = doubled_encrypt_msg.toString() ;
-		
-        return hash ;
+		System.out.println(new String(encrypt_msg));
+
+		byte [] doubled_encrypt_msg = encrypt(pvt, encrypt_msg.toString()); 
+		hash = doubled_encrypt_msg.toString() ;
+
+		return hash ;
 		
 		
 	}
