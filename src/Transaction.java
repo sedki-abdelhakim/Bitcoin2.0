@@ -59,6 +59,14 @@ public class Transaction {
 		cipherText.init(Cipher.ENCRYPT_MODE, PR);
 		return cipherText.doFinal(message);
 	}
+	
+	// decryption
+	public byte[] decrypt(Key PR, byte [] message) throws Exception {
+    	    	Cipher cipherText = Cipher.getInstance("RSA");  
+        	cipherText.init(Cipher.DECRYPT_MODE, PR);
+        	return cipherText.doFinal(message);
+        }
+
 
 	// Hashing Msg 
 	public byte[] Sign_Hash(Key pvt) throws Exception {
