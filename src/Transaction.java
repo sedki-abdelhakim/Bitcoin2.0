@@ -69,6 +69,7 @@ public class Transaction {
 	public byte[] Sign_Hash(Key pvt) throws Exception {
 
 		byte[] encrypt_msg = encrypt(pvt, hash);
+		hash = encrypt_msg;
 		return encrypt_msg;
 
 	}

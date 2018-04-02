@@ -41,7 +41,7 @@ public class Network {
 		return true;
 	}
 
-	public static void announceTransaction(Node node, Transaction transaction) {
+	public static void announceTransaction(Node node, Transaction transaction) throws Exception {
 		//announce the transaction to random number of connected nodes to "node"
 		int myConnectedNodeSize = bitcoinNetwork.get(node).size();
 		if (myConnectedNodeSize != 0) {

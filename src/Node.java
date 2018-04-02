@@ -4,6 +4,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import javax.crypto.Cipher;
@@ -93,8 +94,7 @@ public class Node {
 	public boolean verifyTrasaction(Transaction transaction) throws Exception {
 		byte[] decryptMsg = transaction.decrypt(transaction.getPublicKey_Sender(), transaction.getHash());
 		byte[] newHash = transaction.Generate_Hash();
-		byte[] encryptMsg = transaction.encrypt(prKey,newHash);
-		if(decryptMsg == encryptMsg)
+		if(Arrays.equals(decryptMsg ,newHash))
 			return true;
 		else
 			return false;
@@ -130,7 +130,9 @@ public class Node {
 		byte[] c = encrypt(reciever, secretOwnerScript); // encrypting the owner script by the public key of receiver
 		//so only the reciever can decrypt it using his private, thus proving his ownership of the coin
 
+
 		Transaction t = new Transaction(input, c, this.puKey, reciever, new LinkedList<byte[]>()); // ownership proof of the coin next milestone
+		t.Sign_Hash(this.prKey);
 		return t;
 	}
 
@@ -182,7 +184,7 @@ public class Node {
 		}
 	}
 
-	public void anounceTransaction(Transaction transaction) {
+	public void anounceTransaction(Transaction transaction) throws Exception {
 
 		Network.announceTransaction(this, transaction);
 	}
