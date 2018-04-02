@@ -90,6 +90,9 @@ public class Transaction {
 		return PublicKey_Sender;
 	}
 
+	public void setID(String id){
+		this.id = id;
+	}
 	/* public static void main(String[] args) throws Exception {
 		LinkedList<String> l = new LinkedList<String>();
 		l.add("element");
