@@ -92,6 +92,8 @@ public class Node {
 	}
 
 	public boolean verifyTrasaction(Transaction transaction) throws Exception {
+		//for now we verify the integrty and authenticty of the transaction
+		//later will add verification to the ownership of the sent coins as well (through verifying the ownerscript in each ouput)
 		byte[] decryptMsg = transaction.decrypt(transaction.getPublicKey_Sender(), transaction.getHash());
 		byte[] newHash = transaction.Generate_Hash();
 		if(Arrays.equals(decryptMsg ,newHash))
@@ -159,9 +161,11 @@ public class Node {
 
 		if (reciveMSGQueue.size() != 0) {
 			Transaction transaction = reciveMSGQueue.get(0);
-			System.out.print("Node " + nodeID + " received a transaction");
+
 			boolean isVerified = verifyTrasaction(transaction);
+			System.out.print("Node " + nodeID + " received a transaction");
 			if (isVerified) {
+				System.out.print(" <verfifed>");
 				if (!verifiedTransactions.contains(transaction)) {
 					System.out.println(" >>> Propagate to next node");
 					verifiedTransactions.add(transaction);
@@ -173,6 +177,7 @@ public class Node {
 
 				}
 			} else {
+				System.out.print(" <unverfifed>");
 				if (!unverifiedTransactions.contains(transaction)) {
 					unverifiedTransactions.add(transaction);
 					//we don't propagate invalide transaction
