@@ -42,6 +42,7 @@ public class Network {
 	}
 
 	public static void announceTransaction(Node node, Transaction transaction) {
+		//announce the transaction to random number of connected nodes to "node"
 		int myConnectedNodeSize = bitcoinNetwork.get(node).size();
 		if (myConnectedNodeSize != 0) {
 
@@ -55,6 +56,7 @@ public class Network {
 					dub.add(randomAnnounce);
 					Node NodeToAnnounce = bitcoinNetwork.get(node).get(randomAnnounce);
 					NodeToAnnounce.addReciveMSGQueue(transaction);
+					NodeToAnnounce.receiveTransaction();
 				} else {
 
 					i--;
@@ -68,6 +70,22 @@ public class Network {
 	public static int generateRandomNo(int n) {
 		Random rand = new Random();
 		return rand.nextInt(n) + 1;
+
+	}
+	public static void printNetworkGraph() {
+		//printing the node Ids in a grpah like structure
+		for (Node n : bitcoinNetwork.keySet()) {
+			System.out.print("Node " +n.getNodeID() +" Connected to: ");
+			System.out.print("[ ");
+			for (Node nC : bitcoinNetwork.get(n)) {
+				System.out.print(nC.getNodeID() );
+				System.out.print(" ");
+			}
+			System.out.println("]");
+			System.out.println("-------------------");
+
+			
+		}
 
 	}
 

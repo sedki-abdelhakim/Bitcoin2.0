@@ -4,12 +4,12 @@ import java.util.LinkedList;
 public class BlockChain {
 	private LinkedList<Block> blocks;
 	private int noOfBlocks;
-	private HashMap<String, String> UTXO;
+	private HashMap<String, byte[]> UTXO;
 
 	public BlockChain() {
 		this.noOfBlocks = 0;
 		blocks = new LinkedList<Block>();
-		UTXO = new HashMap<String, String>();
+		UTXO = new HashMap<String, byte[]>();
 	}
 
 	public void addBlock(Block block) {
