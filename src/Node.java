@@ -75,8 +75,11 @@ public class Node {
 			public void run() {
 				while (true) {
 					if (reciveMSGQueue.size() != 0) {
-						receiveTransaction();
-
+						try {
+						    receiveTransaction();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -137,7 +140,7 @@ public class Node {
 		return null;
 	}
 
-	public void receiveTransaction() {
+	public void receiveTransaction() throws Exception {
 
 		Transaction transaction = reciveMSGQueue.get(0);
 		boolean isVerified = verifyTrasaction(transaction);
