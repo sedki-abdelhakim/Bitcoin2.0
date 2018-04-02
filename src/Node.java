@@ -6,7 +6,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PublicKey;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -18,64 +18,60 @@ public class Node {
 	private BlockChain ledger;
 	private LinkedList<Transaction> unverifiedTransactions;
 	private LinkedList<Transaction> verifiedTransactions;
-	private Thread anounceTransactionThread;
-	private Thread receiveTransactionThread;
-	private ArrayList<Transaction> reciveMSGQueue;
+	private LinkedList<Transaction> reciveMSGQueue;
 
 	public Node() throws NoSuchAlgorithmException, NoSuchProviderException {
 		this.generateKeyPair();
 		ledger = new BlockChain();
 		unverifiedTransactions = new LinkedList<Transaction>();
 		unverifiedTransactions = new LinkedList<Transaction>();
-		reciveMSGQueue = new ArrayList<Transaction>();
-
-		anounceTransactionThread = new Thread() {
+		reciveMSGQueue = new LinkedList<Transaction>();
+		nodeID =  generate_UniqueID();
+		
+/*
+		new Thread() {
 			public void run() {
 				InputStreamReader isr = new InputStreamReader(System.in);
 				BufferedReader bf = new BufferedReader(isr);
 
 				try {
-					String te = "";
+					String tt = "";
 					Transaction createdTransaction = null;
 					do {
 
-						System.out.println("Please choose a number: ");
-						System.out.println("1 to join the network: ");
-						System.out.println("2 to create a transaction: ");
-						System.out.println("3 to announce a transaction: ");
-
-						if (te.equals("1")) {
-							System.out.println("Joining.....");
-							joinNetwork();
-						} else if (te.equals("2")) {
-							//Need to complete it 
-							System.out.println("Creating.....");
-						} else if (te.equals("3")) {
-							System.out.println("Announcing....");
-							if (createdTransaction != null) {
-								anounceTransaction(createdTransaction);
-							} else {
-								System.out.println("You need to create a transaction first");
+						tt = bf.readLine();
+						String te = tt.split(", ")[1];
+						String node = tt.split(", ")[0];
+						if (node.equals(nodeID)) {
+							if (te.equals("1")) {
+								if (joinNetwork())
+									System.out.println("Node: " + nodeID + " joined.....");
+								else
+									System.out.println("Node: " + nodeID + " already joined.....");
+							} else if (te.equals("2")) {
+								//Need to complete it 
+								System.out.println("Created transaction.....");
+							} else if (te.equals("3")) {
+								System.out.println("Announced the transaction....");
+								if (createdTransaction != null) {
+									anounceTransaction(createdTransaction);
+								} else {
+									System.out.println("You need to create a transaction first");
+								}
 							}
-
-						} else if (!te.equals("")) {
-							System.out.println("invalid input please try again");
 						}
-
-						// ToDO complete all inside if steps
-					} while ((te = bf.readLine()) != null);
+					} while (tt != null);
 
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
 			}
 
-		};
-		anounceTransactionThread.start();
+		}.start();
+		*/
 
-		receiveTransactionThread = new Thread() {
+		new Thread() {
 			public void run() {
 				while (true) {
 					if (reciveMSGQueue.size() != 0) {
@@ -84,20 +80,15 @@ public class Node {
 					}
 				}
 			}
-		};
-		receiveTransactionThread.start();
+		}.start();
 	}
 
 	public void generateKeyPair() throws NoSuchAlgorithmException {
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 		keyGen.initialize(1024);
 		KeyPair k = keyGen.genKeyPair();
-		puKey = k.getPublic();
-		prKey = k.getPrivate();
-	}
-
-	public void generateID() {
-
+		this.puKey = k.getPublic();
+		this.prKey = k.getPrivate();
 	}
 
 	public boolean verifyTrasaction(Transaction transaction) {
@@ -123,8 +114,8 @@ public class Node {
 		return null;
 	}
 
-	public void joinNetwork() {
-		Network.addNode(this);
+	public boolean joinNetwork() {
+		return Network.addNode(this);
 
 	}
 
@@ -142,7 +133,7 @@ public class Node {
 		return null;
 	}
 
-	public void receiveTransaction() {// need to do it in m1
+	public void receiveTransaction() {
 
 		Transaction transaction = reciveMSGQueue.get(0);
 		boolean isVerified = verifyTrasaction(transaction);
@@ -155,6 +146,7 @@ public class Node {
 		} else {
 			if (!unverifiedTransactions.contains(transaction)) {
 				unverifiedTransactions.add(transaction);
+				//we don't propagate invalide transaction
 
 			}
 		}
@@ -162,7 +154,7 @@ public class Node {
 		reciveMSGQueue.remove(0);
 	}
 
-	public void anounceTransaction(Transaction transaction) {// need to do it in m1
+	public void anounceTransaction(Transaction transaction) {
 
 		Network.announceTransaction(this, transaction);
 	}
@@ -175,12 +167,22 @@ public class Node {
 		this.nodeID = nodeID;
 	}
 
-	public ArrayList<Transaction> getReciveMSGQueue() {
+	public LinkedList<Transaction> getReciveMSGQueue() {
 		return reciveMSGQueue;
 	}
 
 	public void addReciveMSGQueue(Transaction transaction) {
 		this.reciveMSGQueue.add(transaction);
+	}
+	public String generate_UniqueID() {
+		// Timestamp
+		Timestamp ts = new Timestamp(System.currentTimeMillis());
+		// Random number
+		int random_Number = (int) Math.random();
+		// adding them together
+		String idNew = "" + ts.getTime() + random_Number;
+		return idNew;
+
 	}
 
 }
