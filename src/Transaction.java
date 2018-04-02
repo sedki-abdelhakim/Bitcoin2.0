@@ -75,6 +75,14 @@ public class Transaction {
 	public String getHashNextOwner() {
 		return this.hash_Next_Owner;
 	}
+	
+	public byte[] getHash() {
+		return hash;
+	}
+	
+	public Key getPublicKey_Sender() {
+		return PublicKey_Sender;
+	}
 
 	/* public static void main(String[] args) throws Exception {
 		LinkedList<String> l = new LinkedList<String>();
