@@ -90,10 +90,14 @@ public class Node {
 		this.prKey = k.getPrivate();
 	}
 
-	public boolean verifyTrasaction(Transaction transaction) {
-		// ToDO add layers of verification to a transaction 
-
-		return true;
+	public boolean verifyTrasaction(Transaction transaction) throws Exception {
+		byte[] decryptMsg = transaction.decrypt(transaction.getPublicKey_Sender(), transaction.getHash());
+		byte[] newHash = transaction.Generate_Hash();
+		byte[] encryptMsg = transaction.encrypt(prKey,newHash);
+		if(decryptMsg == encryptMsg)
+			return true;
+		else
+			return false;
 	}
 
 	public boolean verifyBlock(Block block) {
@@ -149,7 +153,7 @@ public class Node {
 		return null;
 	}
 
-	public void receiveTransaction() {
+	public void receiveTransaction() throws Exception {
 
 		if (reciveMSGQueue.size() != 0) {
 			Transaction transaction = reciveMSGQueue.get(0);
