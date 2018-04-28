@@ -66,6 +66,31 @@ public class Network {
 		}
 
 	}
+	public static void announceBlocks(Node node, Block block) throws Exception {
+		//announce the blocks to random number of connected nodes to "node"
+		int myConnectedNodeSize = bitcoinNetwork.get(node).size();
+		if (myConnectedNodeSize != 0) {
+
+			int noOfAnnouncedNodes = generateRandomNo(myConnectedNodeSize);
+			HashSet<Integer> dub = new HashSet<Integer>();
+
+			for (int i = 0; i < noOfAnnouncedNodes; i++) {
+				int randomAnnounce = generateRandomNo(myConnectedNodeSize) - 1;
+
+				if (!dub.contains(randomAnnounce)) {
+					dub.add(randomAnnounce);
+					Node NodeToAnnounce = bitcoinNetwork.get(node).get(randomAnnounce);
+					NodeToAnnounce.addReceiveBLKQueue(block);
+					NodeToAnnounce.receiveTransaction();
+				} else {
+
+					i--;
+				}
+			}
+
+		}
+
+	}
 
 	public static int generateRandomNo(int n) {
 		Random rand = new Random();
