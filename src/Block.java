@@ -1,15 +1,18 @@
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 
 public class Block {
-	private String prevHash;
-	private String Hash;
+	private byte [] prevHash;
+	private byte [] Hash;
 	private int nonce;
 	private int numOfTransactions;
 	private LinkedList<Transaction> transactionsList;
 	private String merkleTreeRootHash;
 	
 	
-	public Block( String prevHash, String Hash, int nonce,  LinkedList<Transaction> transactionsList,String merkleTreeRootHash){
+	public Block( byte[] prevHash, byte [] Hash, int nonce,  LinkedList<Transaction> transactionsList,String merkleTreeRootHash){
 		 this.prevHash = prevHash;
 		 this.Hash = Hash;
 		 this.nonce = nonce; 
@@ -17,25 +20,35 @@ public class Block {
 		 this.numOfTransactions = transactionsList.size();
 		 this.merkleTreeRootHash =merkleTreeRootHash;
 	}
+	
+	
+	public byte[] generateHash() throws NoSuchAlgorithmException {
+		MessageDigest msg_digest = MessageDigest.getInstance("SHA-256");
+		String originalString = "" + Integer.toString(nonce).hashCode() + transactionsList.hashCode() 
+								+ prevHash.hashCode();
+		byte[] encodedhash = msg_digest.digest(originalString.getBytes(StandardCharsets.UTF_8));
+		return encodedhash;
+
+	}
+	
+	public void blockMinning(int difficulty) throws NoSuchAlgorithmException {
+		//Create a string with difficulty * "0"
+		String target = new String(new char[difficulty]).replace('\0', '0'); 
+		while(!Hash.toString().substring( 0, difficulty).equals(target)) {
+			nonce ++;
+			Hash = generateHash();
+		}
+		System.out.println("Block Mined: " + Hash);
+	}
 
 
-	public String getPrevHash() {
+	public byte [] getPrevHash() {
 		return prevHash;
 	}
 
 
-	public void setPrevHash(String prevHash) {
-		this.prevHash = prevHash;
-	}
-
-
-	public String getHash() {
+	public byte [] getHash() {
 		return Hash;
-	}
-
-
-	public void setHash( String hash) {
-		Hash = hash;
 	}
 
 
@@ -44,19 +57,10 @@ public class Block {
 	}
 
 
-	public void setNonce(int nonce) {
-		this.nonce = nonce;
-	}
-
-
 	public int getNumOfTransactions() {
 		return numOfTransactions ;
 	}
 
-
-	public void setNumOfTransactions(int numOfTransactions) {
-		this.numOfTransactions = numOfTransactions;
-	}
 
 
 	public LinkedList<Transaction> getTransactionsList() {
@@ -64,18 +68,8 @@ public class Block {
 	}
 
 
-	public void setTransactionsList(LinkedList<Transaction> transactionsList) {
-		this.transactionsList = transactionsList;
-	}
-
-
 	public String getMerkleTreeRootHash() {
 		return merkleTreeRootHash;
-	}
-
-
-	public void setMerkleTreeRootHash(String merkleTreeRootHash) {
-		this.merkleTreeRootHash = merkleTreeRootHash;
 	}
 
 }

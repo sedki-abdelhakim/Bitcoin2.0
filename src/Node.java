@@ -17,6 +17,7 @@ public class Node {
 	private LinkedList<Transaction> unverifiedTransactions;
 	private LinkedList<Transaction> verifiedTransactions;
 	private LinkedList<Transaction> reciveMSGQueue;
+	private LinkedList<Block> blocks;
 	public LinkedList<Output> ownedCoins;
 
 	public Node() throws NoSuchAlgorithmException, NoSuchProviderException {
@@ -207,6 +208,10 @@ public class Node {
 
 	public void addReciveMSGQueue(Transaction transaction) {
 		this.reciveMSGQueue.add(transaction);
+	}
+	
+	public void addReceiveBLKQueue(Block block) {
+		this.blocks.add(block);
 	}
 
 	public String generate_UniqueID() {
