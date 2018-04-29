@@ -1,9 +1,9 @@
 public class Output {
 
-    public String transID;
+    public byte[] transID;
     public byte[] ownerScript;
 
-    public Output(String transID, byte[] ownerScript) {
+    public Output(byte[] transID, byte[] ownerScript) {
         this.transID = transID;
         this.ownerScript = ownerScript;
     }

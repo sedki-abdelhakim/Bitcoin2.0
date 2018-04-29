@@ -3,23 +3,28 @@ import java.util.LinkedList;
 
 public class BlockChain {
 	private LinkedList<Block> blocks;
-	private int noOfBlocks;
 	private HashMap<String, byte[]> UTXO;
-
+	
 	public BlockChain() {
-		this.noOfBlocks = 0;
-		blocks = new LinkedList<Block>();
+		this.blocks = new LinkedList<Block>();
 		UTXO = new HashMap<String, byte[]>();
 	}
 
 	public void addBlock(Block block) {
-		// should verify first in next milestone
-		this.blocks.add(block);
-		this.noOfBlocks++;
+			this.blocks.add(block);
 	}
 
 	public void addToUTXO(Transaction t) {
 		this.UTXO.put(t.getID(), t.getHashNextOwner());
 	}
+
+	public LinkedList<Block> getBlocks(){
+		return blocks;
+	}
+	
+	public HashMap<String, byte[]> getUTXO(){
+		return UTXO;
+	}
+	
 
 }

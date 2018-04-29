@@ -6,7 +6,6 @@ import java.util.Random;
 public class Network {
 	private static HashMap<Node, LinkedList<Node>> bitcoinNetwork;
 	private static int noOfNodes;
-
 	public Network() {
 
 		bitcoinNetwork = new HashMap<Node, LinkedList<Node>>();
@@ -55,8 +54,31 @@ public class Network {
 				if (!dub.contains(randomAnnounce)) {
 					dub.add(randomAnnounce);
 					Node NodeToAnnounce = bitcoinNetwork.get(node).get(randomAnnounce);
-					NodeToAnnounce.addReciveMSGQueue(transaction);
-					NodeToAnnounce.receiveTransaction();
+					NodeToAnnounce.receiveTransaction(transaction);
+				} else {
+
+					i--;
+				}
+			}
+
+		}
+
+	}
+	public static void announceBlocks(Node node, Block block) throws Exception {
+		//announce the blocks to random number of connected nodes to "node"
+		int myConnectedNodeSize = bitcoinNetwork.get(node).size();
+		if (myConnectedNodeSize != 0) {
+
+			int noOfAnnouncedNodes = generateRandomNo(myConnectedNodeSize);
+			HashSet<Integer> dub = new HashSet<Integer>();
+
+			for (int i = 0; i < noOfAnnouncedNodes; i++) {
+				int randomAnnounce = generateRandomNo(myConnectedNodeSize) - 1;
+
+				if (!dub.contains(randomAnnounce)) {
+					dub.add(randomAnnounce);
+					Node NodeToAnnounce = bitcoinNetwork.get(node).get(randomAnnounce);
+					NodeToAnnounce.receiveBlock(block);
 				} else {
 
 					i--;
@@ -85,6 +107,12 @@ public class Network {
 			System.out.println("-------------------");
 
 			
+		}
+
+	}
+	public static void updateLedger() {
+		for (Node n : bitcoinNetwork.keySet()) {
+			n.updateLedger();
 		}
 
 	}
