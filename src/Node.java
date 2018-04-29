@@ -148,7 +148,7 @@ public class Node {
 				cacheLifeTime = 1;
 			}
 		}
-		if (cacheLifeTime == 2) {
+		if (cacheLifeTime == 3) {
 			clearCache();
 		}
 
