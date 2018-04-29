@@ -1,5 +1,5 @@
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+
+import java.util.LinkedList;
 
 public class Test {
 
@@ -7,37 +7,28 @@ public class Test {
 		Network n = new Network();
 		Node n1 = new Node();
 		Node n2 = new Node();
-		Node n3 = new Node();
-		Node n4 = new Node();
 		if (n1.joinNetwork())
 			System.out.println("Node " + n1.getNodeID() + " Joined");
 		if (n2.joinNetwork())
 			System.out.println("Node " + n2.getNodeID() + " Joined");
-		if (n3.joinNetwork())
-			System.out.println("Node " + n3.getNodeID() + " Joined");
-		if (n4.joinNetwork())
-			System.out.println("Node " + n4.getNodeID() + " Joined");
-		Network.printNetworkGraph();
-
-		// add some coins in the network
-		n1.ownedCoins.add(new Output("1233", "owner script top secret".getBytes()));
-		n1.ownedCoins.add(new Output("1234", "owner script top secret 2".getBytes()));
-		n2.ownedCoins.add(new Output("1233", "owner script top secret".getBytes()));
-		n3.ownedCoins.add(new Output("1234", "owner script top secret 2".getBytes()));
-		n4.ownedCoins.add(new Output("1233", "owner script top secret".getBytes()));
-		n4.ownedCoins.add(new Output("1234", "owner script top secret 2".getBytes()));
-
-		//n1 create a valid transaction to n2 sending 1 coin
-		Transaction t = n1.createTransaction(1, n2.getPublicKey(), "owner script top secret".getBytes());
-		n1.anounceTransaction(t);
-
-		System.out.println("------------------------------------------");
-		//n2 create a fake transaction to n3 sending 1 coin
-		Transaction t2 = n2.createTransaction(1, n3.getPublicKey(), "owner script top secret".getBytes());
-		t2.setID("12"); //change some attributes in the transaction (transID)		
-		n2.anounceTransaction(t2);
-
 		
+		Network.printNetworkGraph();
+		
+		//create genesis block to add some money into the network
+		Transaction t1 = n1.createTransaction(new LinkedList<Output>(),n1.getPublicKey(), n1.getPublicKey());
+
+		n1.anounceTransaction(t1);
+
+		Block b1 = n2.createBlock(2, n2.getTransactions(), n2.getPublicKey(),"".getBytes());
+		Block b2 = n2.createBlock(2, n2.getTransactions(), n2.getPublicKey(), "".getBytes());
+		
+		n2.anounceBlock(b1);
+		n2.anounceBlock(b2);
+		Network.updateLedger();
+
+		Block b3 = n2.createBlock(2, n2.getTransactions(), n2.getPublicKey(), n2.getCache().getLast().getHash());
+		n2.anounceBlock(b3);
+		Network.updateLedger();
 
 	}
 

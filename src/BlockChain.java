@@ -5,12 +5,13 @@ import java.util.LinkedList;
 public class BlockChain {
 	private LinkedList<Block> blocks;
 	private int noOfBlocks;
+	private byte[] Hash;
 	private int difficulty = 2;
 	private HashMap<String, byte[]> UTXO;
-
-	public BlockChain() {
+	
+	public BlockChain() throws NoSuchAlgorithmException {
 		this.noOfBlocks = 0;
-		blocks = new LinkedList<Block>();
+		this.blocks = new LinkedList<Block>();
 		UTXO = new HashMap<String, byte[]>();
 	}
 
@@ -29,29 +30,28 @@ public class BlockChain {
 		Block currentBlock; 
 		Block previousBlock;
 		String hashTarget = new String(new char[difficulty]).replace('\0', '0');
-		
+			
 		//loop through blockchain to check hashes:
 		for(int i=1; i < blocks.size(); i++) {
 			currentBlock = blocks.get(i);
 			previousBlock = blocks.get(i-1);
 			//compare registered hash and calculated hash:
-			if(!currentBlock.getHash().equals(currentBlock.generateHash()) ){
-				System.out.println("Current Hashes not equal");			
-				return false;
-			}
-			//compare previous hash and registered previous hash
-			if(!previousBlock.getPrevHash().equals(currentBlock.getPrevHash()) ) {
+				if(!currentBlock.getHash().equals(currentBlock.generateHash()) ){
+					System.out.println("Current Hashes not equal");			
+					return false;
+				}	
+				//compare previous hash and registered previous hash
+				if(!previousBlock.getPrevHash().equals(currentBlock.getPrevHash()) ) {
 				System.out.println("Previous Hashes not equal");
 				return false;
-			}
-			//check if hash is solved
-			if(!currentBlock.getHash().toString().substring( 0, difficulty).equals(hashTarget)) {
+				}
+				//check if hash is solved
+				if(!currentBlock.getHash().toString().substring( 0, difficulty).equals(hashTarget)) {
 				System.out.println("This block hasn't been mined");
-				return false;
+					return false;
+				}
 			}
-		}
 		return true;
 	}
-
 
 }

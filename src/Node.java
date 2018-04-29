@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import javax.crypto.Cipher;
@@ -17,15 +18,20 @@ public class Node {
 	private LinkedList<Transaction> unverifiedTransactions;
 	private LinkedList<Transaction> verifiedTransactions;
 	private LinkedList<Transaction> reciveMSGQueue;
+	private LinkedList<Block> verifiedBlocks;
+	private LinkedList<Block> unverifiedBlocks;
 	private LinkedList<Block> blocks;
 	public LinkedList<Output> ownedCoins;
-
+	
 	public Node() throws NoSuchAlgorithmException, NoSuchProviderException {
 		this.generateKeyPair();
 		ledger = new BlockChain();
 		unverifiedTransactions = new LinkedList<Transaction>();
 		verifiedTransactions = new LinkedList<Transaction>();
 		ownedCoins = new LinkedList<Output>();
+		blocks = new LinkedList<Block>();
+		verifiedBlocks = new LinkedList<Block>();
+		unverifiedBlocks = new LinkedList<Block>();
 		reciveMSGQueue = new LinkedList<Transaction>();
 		nodeID = generate_UniqueID();
 
@@ -103,16 +109,30 @@ public class Node {
 			return false;
 	}
 
-	public boolean verifyBlock(Block block) {
-		// ToDO add layers of verification to a block 
-
+	public boolean verifyBlock(Block block) throws Exception {
+	byte[] decryptMsg = block.decrypt(prKey, block.getHash());
+	byte[] newHash = block.generateHash();
+	if(Arrays.equals(decryptMsg ,newHash))
 		return true;
+	else
+		return false;
 	}
 
-	public Block createBlock() {
-		// Create block
-
+	public Block retrieveBlock(){
+		for (int i = 0; i < unverifiedBlocks.size(); i++) {
+			if(verifiedBlocks.get(i).getHash().equals(unverifiedBlocks.get(i).getHash())){
+				return unverifiedBlocks.get(i);
+			}
+		}
 		return null;
+	}
+	
+	public Block createBlock(int difficulty, Key reciever, byte[] secretStuff) throws Exception {
+		if(difficulty>2||difficulty<2)
+			return null;
+		byte[] c = encrypt(reciever, secretStuff);
+		Block b = new Block(blocks.get(0).getHash(),c,difficulty,verifiedTransactions);
+		return b;
 	}
 
 	public byte[] encrypt(Key PR, byte[] message) throws Exception {
@@ -120,7 +140,7 @@ public class Node {
 		cipherText.init(Cipher.ENCRYPT_MODE, PR);
 		return cipherText.doFinal(message);
 	}
-
+	
 	public Transaction createTransaction(int amount, Key reciever, byte[] secretOwnerScript) throws Exception {
 		LinkedList<Output> input = new LinkedList<Output>();
 		if (amount > ownedCoins.size())
@@ -148,14 +168,9 @@ public class Node {
 
 	}
 
-	public Byte[] createMerkleTree() {
-
-		return null;
-	}
-
-	public Byte[] CreateBlockHash() {
-
-		return null;
+	public byte[] CreateBlockHash(Block block) throws NoSuchAlgorithmException {
+		
+		return block.generateHash();
 	}
 
 	public void receiveTransaction() throws Exception {
@@ -181,7 +196,7 @@ public class Node {
 				System.out.print(" <unverfifed>");
 				if (!unverifiedTransactions.contains(transaction)) {
 					unverifiedTransactions.add(transaction);
-					//we don't propagate invalide transaction
+					//we don't propagate invalid transaction
 				}
 				System.out.println(" >>> Do not Propagate to next node");
 			}
@@ -193,6 +208,11 @@ public class Node {
 	public void anounceTransaction(Transaction transaction) throws Exception {
 
 		Network.announceTransaction(this, transaction);
+	}
+	
+	public void anounceBlock(Block block) throws Exception {
+
+		Network.announceBlocks(this, block);
 	}
 
 	public String getNodeID() {
@@ -227,7 +247,35 @@ public class Node {
 		// adding them together
 		String idNew = "" + ts.getTime() + random_Number;
 		return idNew;
+	}
 
+	public void receiveBlock() throws Exception {
+		if (blocks.size() != 0) {
+			Block block = blocks.get(0);
+			System.out.print("Node " + nodeID + " received a block");
+			boolean isVerified = verifyBlock(block);
+			if (isVerified) {
+				if (!verifiedBlocks.contains(block)) {
+					System.out.println(" >>> Propagate to next node");
+					verifiedBlocks.add(block);
+					anounceBlock(block);
+
+				}
+				else{
+					System.out.println(" >>> Do not propagate to next node");
+
+				}
+			} else {
+				if (!unverifiedBlocks.contains(block)) {
+					unverifiedBlocks.add(block);
+					//we don't propagate invalid blocks
+				}
+				System.out.println(" >>> Do not Propagate to next node");
+			}
+
+			blocks.remove(0);
+		}
+		
 	}
 
 }
