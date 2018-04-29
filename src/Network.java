@@ -81,7 +81,7 @@ public class Network {
 					dub.add(randomAnnounce);
 					Node NodeToAnnounce = bitcoinNetwork.get(node).get(randomAnnounce);
 					NodeToAnnounce.addReceiveBLKQueue(block);
-					NodeToAnnounce.receiveTransaction();
+					NodeToAnnounce.receiveBlock();
 				} else {
 
 					i--;
