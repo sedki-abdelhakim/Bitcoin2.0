@@ -6,7 +6,6 @@ import java.util.Random;
 public class Network {
 	private static HashMap<Node, LinkedList<Node>> bitcoinNetwork;
 	private static int noOfNodes;
-
 	public Network() {
 
 		bitcoinNetwork = new HashMap<Node, LinkedList<Node>>();
@@ -55,8 +54,7 @@ public class Network {
 				if (!dub.contains(randomAnnounce)) {
 					dub.add(randomAnnounce);
 					Node NodeToAnnounce = bitcoinNetwork.get(node).get(randomAnnounce);
-					NodeToAnnounce.addReciveMSGQueue(transaction);
-					NodeToAnnounce.receiveTransaction();
+					NodeToAnnounce.receiveTransaction(transaction);
 				} else {
 
 					i--;
@@ -80,8 +78,7 @@ public class Network {
 				if (!dub.contains(randomAnnounce)) {
 					dub.add(randomAnnounce);
 					Node NodeToAnnounce = bitcoinNetwork.get(node).get(randomAnnounce);
-					NodeToAnnounce.addReceiveBLKQueue(block);
-					NodeToAnnounce.receiveBlock();
+					NodeToAnnounce.receiveBlock(block);
 				} else {
 
 					i--;
@@ -110,6 +107,12 @@ public class Network {
 			System.out.println("-------------------");
 
 			
+		}
+
+	}
+	public static void updateLedger() {
+		for (Node n : bitcoinNetwork.keySet()) {
+			n.updateLedger();
 		}
 
 	}

@@ -7,22 +7,24 @@ import java.util.LinkedList;
 import javax.crypto.Cipher;
 
 public class Block {
+	private Key puKey;
 	private byte [] prevHash;
 	private byte [] Hash;
 	private int nonce;
 	private LinkedList<Transaction> transactionsList;
 	
 	
-	public Block(byte[] prevHash,  LinkedList<Transaction> transactionsList) throws NoSuchAlgorithmException{
+	public Block(byte[] prevHash,  LinkedList<Transaction> transactionsList, Key puKey) throws NoSuchAlgorithmException{
 		 this.prevHash = prevHash;
 		 this.transactionsList = transactionsList;
+		 this.puKey = puKey;
 	}
 	
 	
 	public byte[] generateHash() throws NoSuchAlgorithmException {
 		MessageDigest msg_digest = MessageDigest.getInstance("SHA-256");
-		String originalString = "" + Integer.toString(nonce) + transactionsList.hashCode() 
-								+ prevHash.hashCode();
+		String originalString = "" + Integer.toString(nonce).hashCode() + transactionsList.hashCode() 
+								+ prevHash.hashCode()+ puKey.hashCode();
 		byte[] encodedhash = msg_digest.digest(originalString.getBytes(StandardCharsets.UTF_8));
 		return encodedhash;
 
@@ -33,7 +35,7 @@ public class Block {
 		String target = new String(new char[difficulty]).replace('\0', '0');
 		String str;
 		do {
-			this.nonce = (int)Math.random()*1000000000;
+			this.nonce = (int)(Math.random()*1000000000);
 			Hash = generateHash();
 			str = new String(this.Hash, StandardCharsets.UTF_8);
 		}	
@@ -46,7 +48,19 @@ public class Block {
 		cipherText.init(Cipher.DECRYPT_MODE, PR);
 		return cipherText.doFinal(message);
 	}
+	public byte[] encrypt(Key PR, byte[] message) throws Exception {
+		Cipher cipherText = Cipher.getInstance("RSA");
+		cipherText.init(Cipher.ENCRYPT_MODE, PR);
+		return cipherText.doFinal(message);
+	}
 
+	// Hashing Msg 
+	public byte[] Sign_Hash(Key pvt) throws Exception {
+
+		byte[] encrypt_msg = encrypt(pvt, Hash);
+		Hash = encrypt_msg;
+		return encrypt_msg;
+	}
 
 
 	public byte[] getPrevHash() {
@@ -57,7 +71,9 @@ public class Block {
 	public byte[] getHash() {
 		return Hash;
 	}
-
+	public Key getPuKey() {
+		return puKey;
+	}
 
 	public int getNonce() {
 
